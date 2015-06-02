@@ -6,12 +6,7 @@ Also, we ask that you don't help each other or cheat.  Feel free to use any onli
 
 ## Resources
 
-The following resources are allowed:
-
-* Any notes you've taken so far.
-* Any code you have in your previous projects.
-* learn.fullstackacademy.com.
-* All the slide decks that we've used in class.
+This test is "open book"—feel free to use any resources online or otherwise. On the other hand, do **not** copy and paste. Your code should be your own.
 
 ## Starting
 

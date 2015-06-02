@@ -40,6 +40,9 @@ describe('fake library app', function () {
 		
 		// remember express sessions?
 		// https://github.com/expressjs/session
+		//
+		// Feel free to skip this spec and come back to do it later.
+		// Whether or not it passes should not affect any other specs.
 		xit('/numVisits counts a client\'s visits to it', function (done) {
 			agent
 			.get('/api/numVisits')
@@ -152,7 +155,7 @@ describe('fake library app', function () {
 			xit('DELETE one', function (done) {
 				agent
 				.delete('/api/books/' + book._id)
-				.expect(200)
+				.expect(204)
 				.end(function (err, res) {
 					if (err) return done(err);
 					Book.findById(book._id, function (err, b) {
@@ -181,6 +184,7 @@ describe('fake library app', function () {
 					.expect(200)
 					.end(function (err, res) {
 						if (err) return done(err);
+						// this should be an array of *chapters* not books
 						expect(res.body).to.be.instanceof(Array);
 						done();
 					});
@@ -238,7 +242,7 @@ describe('fake library app', function () {
 					var chapId = newChapter._id;
 					agent
 					.delete('/api/books/' + chapterBook._id + '/chapters/' + chapId)
-					.expect(200)
+					.expect(204)
 					.end(function (err, res) {
 						if (err) return done(err);
 						Chapter.findById(chapId, function (err, c) {

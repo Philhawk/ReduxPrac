@@ -37,29 +37,6 @@ describe('fake library app', function () {
 	});
 
 	describe('/api', function () {
-		
-		// remember express sessions?
-		// https://github.com/expressjs/session
-		//
-		// Feel free to skip this spec and come back to do it later.
-		// Whether or not it passes should not affect any other specs.
-		xit('/numVisits counts a client\'s visits to it', function (done) {
-			agent
-			.get('/api/numVisits')
-			.expect(200)
-			.end(function (err, res) {
-				if (err) return done(err);
-				expect(res.body.number).to.equal(0);
-				agent
-				.get('/api/numVisits')
-				.expect(200)
-				.end(function (err, res) {
-					if (err) return done(err);
-					expect(res.body.number).to.equal(1);
-					done();
-				});
-			});
-		});
 
 		describe('books', function () {
 
@@ -79,7 +56,7 @@ describe('fake library app', function () {
 			before(function (done) {
 				Chapter.create({
 					title: 'First',
-					text: 'Once upon a time the end.',
+					text: 'Once upon a time, the end.',
 					number: 1
 				}, function (err, c) {
 					if (err) return done(err);
@@ -206,7 +183,11 @@ describe('fake library app', function () {
 						Book.findById(chapterBook._id, function (err, b) {
 							if (err) return done(err);
 							expect(b.chapters).to.contain(newChapter._id);
-							done();
+							Chapter.findById(newChapter._id, function (err, c) {
+								if (err) return done(err);
+								expect(c).to.not.be.null;
+								done();
+							});
 						});
 					});
 				});
@@ -260,6 +241,32 @@ describe('fake library app', function () {
 			});
 
 		});
+
+		// EXTRA CREDIT!
+		//
+		// remember express sessions?
+		// https://github.com/expressjs/session
+		//
+		describe('Extra credit', function () {
+			xit('/numVisits counts a client\'s visits to it', function (done) {
+				agent
+					.get('/api/numVisits')
+					.expect(200)
+					.end(function (err, res) {
+						if (err) return done(err);
+						expect(res.body.number).to.equal(0);
+						agent
+							.get('/api/numVisits')
+							.expect(200)
+							.end(function (err, res) {
+								if (err) return done(err);
+								expect(res.body.number).to.equal(1);
+								done();
+							});
+					});
+			});
+		});
+
 
 	});
 

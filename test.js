@@ -131,6 +131,13 @@ describe('fake library app', function () {
 					done();
 				});
 			});
+
+			xit('GET one that doesn\'t exist', function (done) {
+				agent
+				.get('/api/books/123abcnotamongoid')
+				.expect(404)
+				.end(done);
+			});
 			
 			xit('PUT one', function (done) {
 				agent
@@ -145,6 +152,14 @@ describe('fake library app', function () {
 					done();
 				});
 			});
+
+			xit('PUT one that doesn\'t exist', function (done) {
+				agent
+				.put('/api/books/123abcnotamongoid')
+				.send({title: 'Attempt To Update Book Title'})
+				.expect(404)
+				.end(done);
+			});
 			
 			xit('DELETE one', function (done) {
 				agent
@@ -158,6 +173,13 @@ describe('fake library app', function () {
 						done();
 					});
 				});
+			});
+
+			xit('DELETE one that doesn\'t exist', function (done) {
+				agent
+				.delete('/api/books/123abcnotamongoid')
+				.expect(404)
+				.end(done);
 			});
 
 			describe('chapters', function () {
@@ -222,6 +244,13 @@ describe('fake library app', function () {
 						done();
 					});
 				});
+
+				xit('GET one that doesn\'t exist', function (done) {
+					agent
+					.get('/api/books/' + chapterBook._id + '/chapters/123abcnotamongoid')
+					.expect(404)
+					.end(done);
+				});
 				
 				xit('PUT one', function (done) {
 					var chapId = newChapter._id;
@@ -236,6 +265,16 @@ describe('fake library app', function () {
 						expect(res.body.title).to.equal('Updated By Test');
 						done();
 					});
+				});
+
+				xit('PUT one that doesn\'t exist', function (done) {
+					agent
+					.put('/api/books/' + chapterBook._id + '/chapters/123abcnotamongoid')
+					.send({
+						title: 'Attempt To Update Chapter Title'
+					})
+					.expect(404)
+					.end(done);
 				});
 				
 				xit('DELETE one', function (done) {
@@ -257,6 +296,13 @@ describe('fake library app', function () {
 							});
 						});
 					});
+				});
+
+				xit('DELETE one that doesn\'t exist', function (done) {
+					agent
+					.delete('/api/books/' + chapterBook._id + '/chapters/123abcnotamongoid')
+					.expect(404)
+					.end(done);
 				});
 
 			});

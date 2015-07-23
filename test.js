@@ -10,7 +10,7 @@ var fs = require('fs');
 
 describe('fake library app', function () {
 
-	xit('serves up static files on /files route', function (done) {
+	xit('serves up static files (from the static folder in the public folder) on /files route', function (done) {
 		agent
 		.get('/files/index.html')
 		.expect(200)
@@ -25,12 +25,16 @@ describe('fake library app', function () {
 	});
 
 	xit('handles internal server errors', function (done) {
+		// in an actual application, this route wouldn't exist
+		// it's here just to test how you handle errors in an express app
 		agent
 		.get('/broken')
 		.expect(500, done);
 	});
 
 	xit('handles custom errors', function (done) {
+		// in an actual application, this route wouldn't exist
+		// it's here just to test how you handle errors in an express app
 		agent
 		.get('/forbidden')
 		.expect(403, done);
@@ -75,6 +79,19 @@ describe('fake library app', function () {
 					book = b;
 					done();
 				});
+			});
+
+			after(function (done) {
+				author.remove()
+				.then(function () {
+					return chapter.remove();
+				})
+				.then(function () {
+					return book.remove();
+				})
+				.then(function () {
+					done();
+				}, done);
 			});
 
 			xit('GET all', function (done) {

@@ -56,7 +56,7 @@ describe('fake library app', function () {
 			before(function (done) {
 				Chapter.create({
 					title: 'First',
-					text: 'Once upon a time the end.',
+					text: 'Once upon a time, the end.',
 					number: 1
 				}, function (err, c) {
 					if (err) return done(err);
@@ -183,7 +183,11 @@ describe('fake library app', function () {
 						Book.findById(chapterBook._id, function (err, b) {
 							if (err) return done(err);
 							expect(b.chapters).to.contain(newChapter._id);
-							done();
+							Chapter.findById(newChapter._id, function (err, c) {
+								if (err) return done(err);
+								expect(c).to.not.be.null;
+								done();
+							});
 						});
 					});
 				});

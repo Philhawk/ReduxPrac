@@ -10,6 +10,30 @@ var fs = require('fs');
 
 describe('fake library app', function () {
 
+	function dropAll () {
+		return Author.remove({})
+		.then(function () {
+			return Chapter.remove({});
+		})
+		.then(function () {
+			return Book.remove({});
+		});
+	}
+
+	before(function (done) {
+		dropAll()
+		.then(function () {
+			done()
+		}, done)
+	});
+
+	after(function (done) {
+		dropAll()
+		.then(function () {
+			done()
+		}, done)
+	});
+
 	xit('serves up static files (from the static folder in the public folder) on /files route', function (done) {
 		agent
 		.get('/files/index.html')
@@ -81,19 +105,6 @@ describe('fake library app', function () {
 				});
 			});
 
-			after(function (done) {
-				author.remove()
-				.then(function () {
-					return chapter.remove();
-				})
-				.then(function () {
-					return book.remove();
-				})
-				.then(function () {
-					done();
-				}, done);
-			});
-
 			xit('GET all', function (done) {
 				agent
 				.get('/api/books')
@@ -105,29 +116,32 @@ describe('fake library app', function () {
 				});
 			});
 
+			var createdBook;
+
 			xit('POST one', function (done) {
 				agent
 				.post('/api/books')
 				.send({
-					title: 'Made By Test',
+					title: 'Book Made By Test',
 					author: author._id,
 					chapters: [chapter._id]
 				})
 				.expect(201)
 				.end(function (err, res) {
 					if (err) return done(err);
-					expect(res.body.title).to.equal('Made By Test');
+					expect(res.body.title).to.equal('Book Made By Test');
+					createdBook = res.body;
 					done();
 				});
 			});
 			
 			xit('GET one', function (done) {
 				agent
-				.get('/api/books/' + book._id)
+				.get('/api/books/' + createdBook._id)
 				.expect(200)
 				.end(function (err, res) {
 					if (err) return done(err);
-					expect(res.body.title).to.equal(book.title);
+					expect(res.body.title).to.equal(createdBook.title);
 					done();
 				});
 			});
@@ -141,14 +155,14 @@ describe('fake library app', function () {
 			
 			xit('PUT one', function (done) {
 				agent
-				.put('/api/books/' + book._id)
+				.put('/api/books/' + createdBook._id)
 				.send({
-					title: 'Updated By Test'
+					title: 'Book Updated By Test'
 				})
 				.expect(200)
 				.end(function (err, res) {
 					if (err) return done(err);
-					expect(res.body.title).to.equal('Updated By Test');
+					expect(res.body.title).to.equal('Book Updated By Test');
 					done();
 				});
 			});
@@ -163,11 +177,11 @@ describe('fake library app', function () {
 			
 			xit('DELETE one', function (done) {
 				agent
-				.delete('/api/books/' + book._id)
+				.delete('/api/books/' + createdBook._id)
 				.expect(204)
 				.end(function (err, res) {
 					if (err) return done(err);
-					Book.findById(book._id, function (err, b) {
+					Book.findById(createdBook._id, function (err, b) {
 						if (err) return done(err);
 						expect(b).to.be.null;
 						done();
@@ -182,9 +196,22 @@ describe('fake library app', function () {
 				.end(done);
 			});
 
+			xit('GET with query string filter', function (done) {
+				agent
+				// remember that in query strings %20 means a single whitespace character
+				.get('/api/books?title=Best%20Book%20Ever')
+				.expect(200)
+				.end(function (err, res) {
+					if (err) return done(err);
+					expect(res.body).to.be.instanceof(Array);
+					expect(res.body).to.have.length(1);
+					done();
+				});
+			});
+
 			describe('chapters', function () {
 
-				var chapterBook, newChapter;
+				var chapterBook;
 
 				before(function (done) {
 					Book.findOne({}, function (err, b) {
@@ -206,25 +233,27 @@ describe('fake library app', function () {
 					});
 				});
 
+				var createdChapter;
+
 				xit('POST one', function (done) {
 					// notice the addChapter method we've provided for the Book model
 					// it is helpful here!
 					agent
 					.post('/api/books/' + chapterBook._id + '/chapters')
 					.send({
-						title: 'Made By Test',
+						title: 'Chapter Made By Test',
 						text: 'A chapter made by a test',
 						number: 11
 					})
 					.expect(201)
 					.end(function (err, res) {
 						if (err) return done(err);
-						newChapter = res.body;
-						expect(newChapter.title).to.equal('Made By Test');
+						expect(res.body.title).to.equal('Chapter Made By Test');
+						createdChapter = res.body;
 						Book.findById(chapterBook._id, function (err, b) {
 							if (err) return done(err);
-							expect(b.chapters).to.contain(newChapter._id);
-							Chapter.findById(newChapter._id, function (err, c) {
+							expect(b.chapters).to.contain(createdChapter._id);
+							Chapter.findById(createdChapter._id, function (err, c) {
 								if (err) return done(err);
 								expect(c).to.not.be.null;
 								done();
@@ -234,7 +263,7 @@ describe('fake library app', function () {
 				});
 				
 				xit('GET one', function (done) {
-					var chapId = newChapter._id;
+					var chapId = createdChapter._id;
 					agent
 					.get('/api/books/' + chapterBook._id + '/chapters/' + chapId)
 					.expect(200)
@@ -253,16 +282,16 @@ describe('fake library app', function () {
 				});
 				
 				xit('PUT one', function (done) {
-					var chapId = newChapter._id;
+					var chapId = createdChapter._id;
 					agent
 					.put('/api/books/' + chapterBook._id + '/chapters/' + chapId)
 					.send({
-						title: 'Updated By Test'
+						title: 'Chapter Updated By Test'
 					})
 					.expect(200)
 					.end(function (err, res) {
 						if (err) return done(err);
-						expect(res.body.title).to.equal('Updated By Test');
+						expect(res.body.title).to.equal('Chapter Updated By Test');
 						done();
 					});
 				});
@@ -280,7 +309,7 @@ describe('fake library app', function () {
 				xit('DELETE one', function (done) {
 					// notice the removeChapter method we've provided for the Book model
 					// it is helpful here!
-					var chapId = newChapter._id;
+					var chapId = createdChapter._id;
 					agent
 					.delete('/api/books/' + chapterBook._id + '/chapters/' + chapId)
 					.expect(204)

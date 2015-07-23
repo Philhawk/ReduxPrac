@@ -94,11 +94,14 @@ describe('fake library app', function () {
 			});
 
 			before(function (done) {
-				Book.create({
+				Book.create([{
 					title: 'Best Book Ever',
 					author: author,
 					chapters: [chapter]
-				}, function (err, b) {
+				}, {
+					title: 'Worst Book Ever',
+					author: author
+				}], function (err, b) {
 					if (err) return done(err);
 					book = b;
 					done();
@@ -112,6 +115,7 @@ describe('fake library app', function () {
 				.end(function (err, res) {
 					if (err) return done(err);
 					expect(res.body).to.be.instanceof(Array);
+					expect(res.body).to.have.length(2);
 					done();
 				});
 			});

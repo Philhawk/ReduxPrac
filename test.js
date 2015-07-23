@@ -37,29 +37,6 @@ describe('fake library app', function () {
 	});
 
 	describe('/api', function () {
-		
-		// remember express sessions?
-		// https://github.com/expressjs/session
-		//
-		// Feel free to skip this spec and come back to do it later.
-		// Whether or not it passes should not affect any other specs.
-		xit('/numVisits counts a client\'s visits to it', function (done) {
-			agent
-			.get('/api/numVisits')
-			.expect(200)
-			.end(function (err, res) {
-				if (err) return done(err);
-				expect(res.body.number).to.equal(0);
-				agent
-				.get('/api/numVisits')
-				.expect(200)
-				.end(function (err, res) {
-					if (err) return done(err);
-					expect(res.body.number).to.equal(1);
-					done();
-				});
-			});
-		});
 
 		describe('books', function () {
 
@@ -257,6 +234,30 @@ describe('fake library app', function () {
 					});
 				});
 
+			});
+
+		});
+
+		// remember express sessions?
+		// https://github.com/expressjs/session
+		describe('/numVisits', function () {
+
+			xit('counts a client\'s visits to it', function (done) {
+				agent
+				.get('/api/numVisits')
+				.expect(200)
+				.end(function (err, res) {
+					if (err) return done(err);
+					expect(res.body.number).to.equal(0);
+					agent
+					.get('/api/numVisits')
+					.expect(200)
+					.end(function (err, res) {
+						if (err) return done(err);
+						expect(res.body.number).to.equal(1);
+						done();
+					});
+				});
 			});
 
 		});

@@ -1,6 +1,8 @@
-var Schema = require('mongoose').Schema;
+var mongoose = require('mongoose');
 
-module.exports = new Schema({
+var authorSchema = new mongoose.Schema({
 	firstName: String,
 	lastName: String
 });
+
+module.exports = mongoose.model('Author', authorSchema);

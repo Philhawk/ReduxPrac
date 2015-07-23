@@ -168,6 +168,8 @@ describe('fake library app', function () {
 				});
 
 				xit('POST one', function (done) {
+					// notice the addChapter method we've provided for the Book model
+					// it is helpful here!
 					agent
 					.post('/api/books/' + chapterBook._id + '/chapters')
 					.send({
@@ -220,6 +222,8 @@ describe('fake library app', function () {
 				});
 				
 				xit('DELETE one', function (done) {
+					// notice the removeChapter method we've provided for the Book model
+					// it is helpful here!
 					var chapId = newChapter._id;
 					agent
 					.delete('/api/books/' + chapterBook._id + '/chapters/' + chapId)
@@ -247,13 +251,16 @@ describe('fake library app', function () {
 		describe('/numVisits', function () {
 
 			xit('counts a client\'s visits to it', function (done) {
-				agent
+				// should originally send back zero
+				// but should increment, thus returning one the next time around
+				var clientA = agent;
+				clientA
 				.get('/api/numVisits')
 				.expect(200)
 				.end(function (err, res) {
 					if (err) return done(err);
 					expect(res.body.number).to.equal(0);
-					agent
+					clientA
 					.get('/api/numVisits')
 					.expect(200)
 					.end(function (err, res) {
@@ -262,6 +269,21 @@ describe('fake library app', function () {
 						done();
 					});
 				});
+			});
+
+
+			xit('distinguises between clients', function (done) {
+				// should be zero again for this client!
+				var clientB = supertest.agent(app);
+				clientB
+				.get('/api/numVisits')
+				.expect(200)
+				.end(function (err, res) {
+					if (err) return done(err);
+					expect(res.body.number).to.equal(0);
+					done();
+				});
+
 			});
 
 		});

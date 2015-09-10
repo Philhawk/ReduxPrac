@@ -20,18 +20,12 @@ describe('fake library app', function () {
 		});
 	}
 
-	before(function (done) {
-		dropAll()
-		.then(function () {
-			done()
-		}, done)
+	before(function () {
+		return dropAll();
 	});
 
-	after(function (done) {
-		dropAll()
-		.then(function () {
-			done()
-		}, done)
+	after(function () {
+		return dropAll();
 	});
 
 	xit('serves up static files (from the static folder in the public folder) on /files route', function (done) {

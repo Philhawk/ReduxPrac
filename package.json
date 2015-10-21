@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "mocha test.js"
+    "test": "mocha --reporter spec test.js",
+    "grade": "mocha --reporter spec --timeout 300 test.js"
   },
   "author": "",
   "license": "ISC",

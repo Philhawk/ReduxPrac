@@ -14,7 +14,7 @@ describe('fake library app', function () {
 	function dropAll(){
 		return Promise.all([
 			Author.remove(), 
-			Chaptor.remove(), 
+			Chapter.remove(), 
 			Book.remove()
 		])
 	}
@@ -27,7 +27,7 @@ describe('fake library app', function () {
 		return dropAll();
 	});
 
-	xit('serves up static files (from the static folder in the public folder) on /files route', function (done) {
+	it('serves up static files (from the static folder in the public folder) on /files route', function (done) {
 		agent
 		.get('/files/index.html')
 		.expect(200)
@@ -41,7 +41,7 @@ describe('fake library app', function () {
 		});
 	});
 
-	xit('handles internal server errors', function (done) {
+	it('handles internal server errors', function (done) {
 		// in an actual application, this route wouldn't exist
 		// it's here just to test how you handle errors in an express app
 		agent
@@ -49,7 +49,7 @@ describe('fake library app', function () {
 		.expect(500, done);
 	});
 
-	xit('handles custom errors', function (done) {
+	it('handles custom errors', function (done) {
 		// in an actual application, this route wouldn't exist
 		// it's here just to test how you handle errors in an express app
 		agent
@@ -101,7 +101,7 @@ describe('fake library app', function () {
 				});
 			});
 
-			xit('GET all', function (done) {
+			it('GET all', function (done) {
 				agent
 				.get('/api/books')
 				.expect(200)
@@ -115,7 +115,7 @@ describe('fake library app', function () {
 
 			var createdBook;
 
-			xit('POST one', function (done) {
+			it('POST one', function (done) {
 				agent
 				.post('/api/books')
 				.send({
@@ -132,7 +132,7 @@ describe('fake library app', function () {
 				});
 			});
 			
-			xit('GET one', function (done) {
+			it('GET one', function (done) {
 				agent
 				.get('/api/books/' + createdBook._id)
 				.expect(200)
@@ -143,14 +143,14 @@ describe('fake library app', function () {
 				});
 			});
 
-			xit('GET one that doesn\'t exist', function (done) {
+			it('GET one that doesn\'t exist', function (done) {
 				agent
 				.get('/api/books/123abcnotamongoid')
 				.expect(404)
 				.end(done);
 			});
 			
-			xit('PUT one', function (done) {
+			it('PUT one', function (done) {
 				agent
 				.put('/api/books/' + createdBook._id)
 				.send({
@@ -164,7 +164,7 @@ describe('fake library app', function () {
 				});
 			});
 
-			xit('PUT one that doesn\'t exist', function (done) {
+			it('PUT one that doesn\'t exist', function (done) {
 				agent
 				.put('/api/books/123abcnotamongoid')
 				.send({title: 'Attempt To Update Book Title'})
@@ -172,7 +172,7 @@ describe('fake library app', function () {
 				.end(done);
 			});
 			
-			xit('DELETE one', function (done) {
+			it('DELETE one', function (done) {
 				agent
 				.delete('/api/books/' + createdBook._id)
 				.expect(204)
@@ -186,14 +186,14 @@ describe('fake library app', function () {
 				});
 			});
 
-			xit('DELETE one that doesn\'t exist', function (done) {
+			it('DELETE one that doesn\'t exist', function (done) {
 				agent
 				.delete('/api/books/123abcnotamongoid')
 				.expect(404)
 				.end(done);
 			});
 
-			xit('GET with query string filter', function (done) {
+			it('GET with query string filter', function (done) {
 				agent
 				// remember that in query strings %20 means a single whitespace character
 				.get('/api/books?title=Best%20Book%20Ever')
@@ -218,7 +218,7 @@ describe('fake library app', function () {
 					});
 				});
 
-				xit('GET all', function (done) {
+				it('GET all', function (done) {
 					agent
 					.get('/api/books/' + chapterBook._id + '/chapters')
 					.expect(200)
@@ -232,7 +232,7 @@ describe('fake library app', function () {
 
 				var createdChapter;
 
-				xit('POST one', function (done) {
+				it('POST one', function (done) {
 					// notice the addChapter method we've provided for the Book model
 					// it is helpful here!
 					agent
@@ -259,7 +259,7 @@ describe('fake library app', function () {
 					});
 				});
 				
-				xit('GET one', function (done) {
+				it('GET one', function (done) {
 					var chapId = createdChapter._id;
 					agent
 					.get('/api/books/' + chapterBook._id + '/chapters/' + chapId)
@@ -271,14 +271,14 @@ describe('fake library app', function () {
 					});
 				});
 
-				xit('GET one that doesn\'t exist', function (done) {
+				it('GET one that doesn\'t exist', function (done) {
 					agent
 					.get('/api/books/' + chapterBook._id + '/chapters/123abcnotamongoid')
 					.expect(404)
 					.end(done);
 				});
 				
-				xit('PUT one', function (done) {
+				it('PUT one', function (done) {
 					var chapId = createdChapter._id;
 					agent
 					.put('/api/books/' + chapterBook._id + '/chapters/' + chapId)
@@ -293,7 +293,7 @@ describe('fake library app', function () {
 					});
 				});
 
-				xit('PUT one that doesn\'t exist', function (done) {
+				it('PUT one that doesn\'t exist', function (done) {
 					agent
 					.put('/api/books/' + chapterBook._id + '/chapters/123abcnotamongoid')
 					.send({
@@ -303,7 +303,7 @@ describe('fake library app', function () {
 					.end(done);
 				});
 				
-				xit('DELETE one', function (done) {
+				it('DELETE one', function (done) {
 					// notice the removeChapter method we've provided for the Book model
 					// it is helpful here!
 					var chapId = createdChapter._id;
@@ -324,7 +324,7 @@ describe('fake library app', function () {
 					});
 				});
 
-				xit('DELETE one that doesn\'t exist', function (done) {
+				it('DELETE one that doesn\'t exist', function (done) {
 					agent
 					.delete('/api/books/' + chapterBook._id + '/chapters/123abcnotamongoid')
 					.expect(404)
@@ -339,7 +339,7 @@ describe('fake library app', function () {
 		// https://github.com/expressjs/session
 		describe('/numVisits', function () {
 
-			xit('counts a client\'s visits to it', function (done) {
+			it('counts a client\'s visits to it', function (done) {
 				// should originally send back zero
 				// but should increment, thus returning one the next time around
 				var clientA = agent;
@@ -361,7 +361,7 @@ describe('fake library app', function () {
 			});
 
 
-			xit('distinguises between clients', function (done) {
+			it('distinguises between clients', function (done) {
 				// should be zero again for this client!
 				var clientB = supertest.agent(app);
 				clientB

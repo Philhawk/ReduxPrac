@@ -14,7 +14,7 @@ describe('fake library app', function () {
 	function dropAll(){
 		return Promise.all([
 			Author.remove(), 
-			Chaptor.remove(), 
+			Chapter.remove(), 
 			Book.remove()
 		])
 	}

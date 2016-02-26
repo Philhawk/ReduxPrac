@@ -1,4 +1,5 @@
 var app = require('./app');
+var Promise = require('bluebird');
 var models = require('./models'),
 	Author = models.Author,
 	Book = models.Book,
@@ -10,14 +11,12 @@ var fs = require('fs');
 
 describe('fake library app', function () {
 
-	function dropAll () {
-		return Author.remove({})
-		.then(function () {
-			return Chapter.remove({});
-		})
-		.then(function () {
-			return Book.remove({});
-		});
+	function dropAll(){
+		return Promise.all([
+			Author.remove(), 
+			Chaptor.remove(), 
+			Book.remove()
+		])
 	}
 
 	before(function () {

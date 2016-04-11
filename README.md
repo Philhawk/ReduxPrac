@@ -2,7 +2,7 @@
 
 ## Resources
 
-Feel free to use any online documentation, but do **not** copy and paste any code. You may use any notes you've taken, but you may **not** refer to any past workshop or assessment code.
+Feel free to use any online documentation, but do **not** copy and paste any code. You may use any notes you've taken, but you may **not** refer to any past workshop or assessment code. Also do **not** work with others on this assessment (though feel free to do so submitting).
 
 ## Starting
 
@@ -12,8 +12,12 @@ Feel free to use any online documentation, but do **not** copy and paste any cod
 4. Read through the project as it currently stands.
 5. Start working through the tests in `test.js` (run `npm test` to see how you're doing). You may have to mark them as active (from pending) by changing `xit` to `it`.
 
+## Important
+
+The first 12 specs are mandatory. Though you are encouraged to, you are not required to complete any of the specs after that—the final 10. The test source code includes a very noticeable comment between the border between mandatory and non-mandatory.
+
 ## Submitting
 
 1. Add and commit to your repo
 2. Push all changes to your fork
-3. Zip up your project directory and email it to instructors+assessments@fullstackacademy.com
+3. Mark assessment as complete in learn.fullstackacademy.com

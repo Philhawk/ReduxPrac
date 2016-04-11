@@ -7,7 +7,7 @@ var Book = require('./book');
 var Chapter = require('./chapter');
 
 module.exports = {
-	Author: Author,
-	Book: Book,
-	Chapter: Chapter
+  Author: Author,
+  Book: Book,
+  Chapter: Chapter
 };

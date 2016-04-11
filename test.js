@@ -12,6 +12,10 @@ var mongoose = require('mongoose');
 
 describe('fake library app', function () {
 
+  function toPlainObject (doc) {
+    return JSON.parse(JSON.stringify(doc));
+  }
+
   function dropAll(){
     return Promise.all([
       Author.remove(), 
@@ -130,7 +134,13 @@ describe('fake library app', function () {
         .end(function (err, res) {
           if (err) return done(err);
           expect(res.body.title).to.equal('Book Made By Test');
-          done();
+          expect(res.body._id).to.exist;
+          Book.findById(res.body._id, function (err, b) {
+            if (err) return done(err);
+            expect(b).to.not.be.null;
+            expect(res.body).to.eql(toPlainObject(b));
+            done();
+          });
         });
       });
       
@@ -169,7 +179,12 @@ describe('fake library app', function () {
         .end(function (err, res) {
           if (err) return done(err);
           expect(res.body.title).to.equal('Book Updated By Test');
-          done();
+          Book.findById(book._id, function (err, b) {
+            if (err) return done(err);
+            expect(b).to.not.be.null;
+            expect(res.body).to.eql(toPlainObject(b));
+            done();
+          });
         });
       });
 
@@ -293,6 +308,7 @@ describe('fake library app', function () {
               Chapter.findById(createdChapter._id, function (err, c) {
                 if (err) return done(err);
                 expect(c).to.not.be.null;
+                expect(res.body).to.eql(toPlainObject(c));
                 done();
               });
             });
@@ -336,7 +352,12 @@ describe('fake library app', function () {
           .end(function (err, res) {
             if (err) return done(err);
             expect(res.body.title).to.equal('Chapter Updated By Test');
-            done();
+            Chapter.findById(chapId, function (err, c) {
+              if (err) return done(err);
+              expect(c).to.not.be.null;
+              expect(res.body).to.eql(toPlainObject(c));
+              done();
+            });
           });
         });
 

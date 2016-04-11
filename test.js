@@ -20,11 +20,11 @@ describe('fake library app', function () {
     ])
   }
 
-  before(function () {
+  beforeEach(function () {
     return dropAll();
   });
 
-  after(function () {
+  afterEach(function () {
     return dropAll();
   });
 
@@ -68,7 +68,7 @@ describe('fake library app', function () {
 
       var author, book, chapter;
 
-      before(function (done) {
+      beforeEach(function (done) {
         Author.create({
           firstName: 'Testy',
           lastName: 'McTesterson'
@@ -79,7 +79,7 @@ describe('fake library app', function () {
         });
       });
 
-      before(function (done) {
+      beforeEach(function (done) {
         Chapter.create({
           title: 'First',
           text: 'Once upon a time, the end.',
@@ -91,7 +91,7 @@ describe('fake library app', function () {
         });
       });
 
-      before(function (done) {
+      beforeEach(function (done) {
         Book.create([{
           title: 'Best Book Ever',
           author: author,
@@ -99,9 +99,9 @@ describe('fake library app', function () {
         }, {
           title: 'Worst Book Ever',
           author: author
-        }], function (err, b) {
+        }], function (err, bs) {
           if (err) return done(err);
-          book = b;
+          book = bs[0];
           done();
         });
       });
@@ -118,8 +118,6 @@ describe('fake library app', function () {
         });
       });
 
-      var createdBook;
-
       xit('POST one', function (done) {
         agent
         .post('/api/books')
@@ -132,18 +130,17 @@ describe('fake library app', function () {
         .end(function (err, res) {
           if (err) return done(err);
           expect(res.body.title).to.equal('Book Made By Test');
-          createdBook = res.body;
           done();
         });
       });
       
       xit('GET one', function (done) {
         agent
-        .get('/api/books/' + createdBook._id)
+        .get('/api/books/' + book._id)
         .expect(200)
         .end(function (err, res) {
           if (err) return done(err);
-          expect(res.body.title).to.equal(createdBook.title);
+          expect(res.body.title).to.equal(book.title);
           done();
         });
       });
@@ -164,7 +161,7 @@ describe('fake library app', function () {
       
       xit('PUT one', function (done) {
         agent
-        .put('/api/books/' + createdBook._id)
+        .put('/api/books/' + book._id)
         .send({
           title: 'Book Updated By Test'
         })
@@ -194,11 +191,11 @@ describe('fake library app', function () {
 
       xit('DELETE one', function (done) {
         agent
-        .delete('/api/books/' + createdBook._id)
+        .delete('/api/books/' + book._id)
         .expect(204)
         .end(function (err, res) {
           if (err) return done(err);
-          Book.findById(createdBook._id, function (err, b) {
+          Book.findById(book._id, function (err, b) {
             if (err) return done(err);
             expect(b).to.be.null;
             done();
@@ -241,14 +238,26 @@ describe('fake library app', function () {
 
       describe('/chapters', function () {
 
-        var chapterBook;
+        var addedChapter, chapterBook;
 
-        before(function (done) {
+        beforeEach(function (done) {
           Book.findOne({}, function (err, b) {
             if (err) return done(err);
             chapterBook = b;
             done();
           });
+        });
+
+        beforeEach(function (done) {
+          chapterBook.addChapter({
+            title: 'Added Chapter',
+            number: 1,
+            text: 'Once upon a time...'
+          })
+          .then(function (c) {
+            addedChapter = c;
+          })
+          .then(done);
         });
 
         xit('GET all', function (done) {
@@ -262,8 +271,6 @@ describe('fake library app', function () {
             done();
           });
         });
-
-        var createdChapter;
 
         xit('POST one', function (done) {
           // notice the addChapter method we've provided for the Book model
@@ -279,7 +286,7 @@ describe('fake library app', function () {
           .end(function (err, res) {
             if (err) return done(err);
             expect(res.body.title).to.equal('Chapter Made By Test');
-            createdChapter = res.body;
+            var createdChapter = res.body;
             Book.findById(chapterBook._id, function (err, b) {
               if (err) return done(err);
               expect(b.chapters).to.contain(createdChapter._id);
@@ -293,7 +300,7 @@ describe('fake library app', function () {
         });
         
         xit('GET one', function (done) {
-          var chapId = createdChapter._id;
+          var chapId = addedChapter._id.toHexString();
           agent
           .get('/api/books/' + chapterBook._id + '/chapters/' + chapId)
           .expect(200)
@@ -319,7 +326,7 @@ describe('fake library app', function () {
         });
         
         xit('PUT one', function (done) {
-          var chapId = createdChapter._id;
+          var chapId = addedChapter._id;
           agent
           .put('/api/books/' + chapterBook._id + '/chapters/' + chapId)
           .send({
@@ -356,7 +363,7 @@ describe('fake library app', function () {
         xit('DELETE one', function (done) {
           // notice the removeChapter method we've provided for the Book model
           // it is helpful here!
-          var chapId = createdChapter._id;
+          var chapId = addedChapter._id;
           agent
           .delete('/api/books/' + chapterBook._id + '/chapters/' + chapId)
           .expect(204)

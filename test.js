@@ -63,7 +63,7 @@ describe('fake library app', function () {
     describe('/books', function () {
 
       function randomMongoID () {
-        return new mongoose.Schema.ObjectId();
+        return new mongoose.Types.ObjectId();
       }
 
       var author, book, chapter;
@@ -154,6 +154,13 @@ describe('fake library app', function () {
         .expect(404)
         .end(done);
       });
+
+      xit('GET one using invalid ID', function (done) {
+        agent
+        .get('/api/books/123abcnotamongoid')
+        .expect(500)
+        .end(done);
+      });
       
       xit('PUT one', function (done) {
         agent
@@ -176,7 +183,15 @@ describe('fake library app', function () {
         .expect(404)
         .end(done);
       });
-      
+
+      xit('PUT one using invalid ID', function (done) {
+        agent
+        .put('/api/books/123abcnotamongoid')
+        .send({title: 'Attempt To Update Book Title'})
+        .expect(500)
+        .end(done);
+      });
+
       xit('DELETE one', function (done) {
         agent
         .delete('/api/books/' + createdBook._id)
@@ -195,6 +210,13 @@ describe('fake library app', function () {
         agent
         .delete('/api/books/' + randomMongoID())
         .expect(404)
+        .end(done);
+      });
+
+      xit('DELETE one using invalid ID', function (done) {
+        agent
+        .delete('/api/books/123abcnotamongoid')
+        .expect(500)
         .end(done);
       });
 
@@ -288,6 +310,13 @@ describe('fake library app', function () {
           .expect(404)
           .end(done);
         });
+
+        xit('GET one using invalid ID', function (done) {
+          agent
+          .get('/api/books/123abcnotamongoid')
+          .expect(500)
+          .end(done);
+        });
         
         xit('PUT one', function (done) {
           var chapId = createdChapter._id;
@@ -313,7 +342,17 @@ describe('fake library app', function () {
           .expect(404)
           .end(done);
         });
-        
+
+        xit('PUT one using invalid ID', function (done) {
+          agent
+          .put('/api/books/' + chapterBook._id + '/chapters/123abcnotamongoid')
+          .send({
+            title: 'Attempt To Update Chapter Title'
+          })
+          .expect(500)
+          .end(done);
+        });
+
         xit('DELETE one', function (done) {
           // notice the removeChapter method we've provided for the Book model
           // it is helpful here!
@@ -339,6 +378,13 @@ describe('fake library app', function () {
           agent
           .delete('/api/books/' + chapterBook._id + '/chapters/' + randomMongoID())
           .expect(404)
+          .end(done);
+        });
+
+        xit('DELETE one using invalid ID', function (done) {
+          agent
+          .delete('/api/books/' + chapterBook._id + '/chapters/123abcnotamongoid')
+          .expect(500)
           .end(done);
         });
 

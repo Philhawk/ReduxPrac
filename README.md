@@ -14,7 +14,7 @@ Feel free to use any online documentation, but do **not** copy and paste any cod
 
 ## Important
 
-The first 12 specs are mandatory. Though you are encouraged to, you are not required to complete any of the specs after that—the final 10. The test source code includes a very noticeable comment between the border between mandatory and non-mandatory.
+The first 15 specs are mandatory. Though you are encouraged to, you are not required to complete any of the specs after that—the final 13. The test source code includes a very noticeable comment between the border between mandatory and non-mandatory.
 
 ## Submitting
 

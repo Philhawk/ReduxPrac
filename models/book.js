@@ -30,4 +30,12 @@ bookSchema.methods.removeChapter = function (chapter) {
   });
 };
 
+bookSchema.pre('save', function (next) {
+  setTimeout(next, 5); // for the specs: delay just enough to make sure you handle async stuff properly
+});
+
+bookSchema.pre('remove', function (next) {
+  setTimeout(next, 5); // for the specs: delay just enough to make sure you handle async stuff properly
+});
+
 module.exports = mongoose.model('Book', bookSchema);

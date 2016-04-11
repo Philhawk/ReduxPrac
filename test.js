@@ -8,6 +8,7 @@ var expect = require('chai').expect;
 var supertest = require('supertest');
 var agent = supertest.agent(app);
 var fs = require('fs');
+var mongoose = require('mongoose');
 
 describe('fake library app', function () {
 
@@ -59,7 +60,11 @@ describe('fake library app', function () {
 
   describe('/api', function () {
 
-    describe('books', function () {
+    describe('/books', function () {
+
+      function randomMongoID () {
+        return new mongoose.Schema.ObjectId();
+      }
 
       var author, book, chapter;
 
@@ -145,7 +150,7 @@ describe('fake library app', function () {
 
       xit('GET one that doesn\'t exist', function (done) {
         agent
-        .get('/api/books/123abcnotamongoid')
+        .get('/api/books/' + randomMongoID())
         .expect(404)
         .end(done);
       });
@@ -166,7 +171,7 @@ describe('fake library app', function () {
 
       xit('PUT one that doesn\'t exist', function (done) {
         agent
-        .put('/api/books/123abcnotamongoid')
+        .put('/api/books/' + randomMongoID())
         .send({title: 'Attempt To Update Book Title'})
         .expect(404)
         .end(done);
@@ -188,7 +193,7 @@ describe('fake library app', function () {
 
       xit('DELETE one that doesn\'t exist', function (done) {
         agent
-        .delete('/api/books/123abcnotamongoid')
+        .delete('/api/books/' + randomMongoID())
         .expect(404)
         .end(done);
       });
@@ -206,7 +211,7 @@ describe('fake library app', function () {
         });
       });
 
-      describe('chapters', function () {
+      describe('/chapters', function () {
 
         var chapterBook;
 
@@ -273,7 +278,7 @@ describe('fake library app', function () {
 
         xit('GET one that doesn\'t exist', function (done) {
           agent
-          .get('/api/books/' + chapterBook._id + '/chapters/123abcnotamongoid')
+          .get('/api/books/' + chapterBook._id + '/chapters/' + randomMongoID())
           .expect(404)
           .end(done);
         });
@@ -295,7 +300,7 @@ describe('fake library app', function () {
 
         xit('PUT one that doesn\'t exist', function (done) {
           agent
-          .put('/api/books/' + chapterBook._id + '/chapters/123abcnotamongoid')
+          .put('/api/books/' + chapterBook._id + '/chapters/' + randomMongoID())
           .send({
             title: 'Attempt To Update Chapter Title'
           })
@@ -326,7 +331,7 @@ describe('fake library app', function () {
 
         xit('DELETE one that doesn\'t exist', function (done) {
           agent
-          .delete('/api/books/' + chapterBook._id + '/chapters/123abcnotamongoid')
+          .delete('/api/books/' + chapterBook._id + '/chapters/' + randomMongoID())
           .expect(404)
           .end(done);
         });
@@ -335,9 +340,9 @@ describe('fake library app', function () {
 
     });
 
-    // remember express sessions?
-    // https://github.com/expressjs/session
     describe('/numVisits', function () {
+      // remember express sessions?
+      // https://github.com/expressjs/session
 
       xit('counts a client\'s visits to it', function (done) {
         // should originally send back zero

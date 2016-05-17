@@ -1,8 +1,8 @@
-# Review Week Assessment - Express
+# Review Week Checkpoint - Express
 
 ## Resources
 
-Feel free to use any online documentation, but do **not** copy and paste any code. You may use any notes you've taken, but you may **not** refer to any past workshop or assessment code. Also do **not** work with others on this assessment (though feel free to do so submitting).
+Feel free to use any online documentation, but do **not** copy and paste any code. You may use any notes you've taken, but you may **not** refer to any past workshop or checkpoint code. Also do **not** work with others on this checkpoint (though feel free to do so after submitting).
 
 ## Starting
 
@@ -20,4 +20,4 @@ The first 15 specs are mandatory. Though you are encouraged to, you are not requ
 
 1. Add and commit to your repo
 2. Push all changes to your fork
-3. Mark assessment as complete in learn.fullstackacademy.com
+3. Mark checkpoint as complete in learn.fullstackacademy.com

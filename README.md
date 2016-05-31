@@ -8,9 +8,8 @@ Feel free to use any online documentation, but do **not** copy and paste any cod
 
 1. Fork and clone this repo.
 2. Install node modules.
-3. Seed the database with `node seed`.
-4. Read through the project as it currently stands.
-5. Start working through the tests in `test.js` (run `npm test` to see how you're doing). You may have to mark them as active (from pending) by changing `xit` to `it`.
+3. Read through the project as it currently stands.
+4. Start working through the tests in `test.js` (run `npm test` to see how you're doing). You may have to mark them as active (from pending) by changing `xit` to `it`.
 
 ## Important
 

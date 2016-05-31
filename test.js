@@ -3,33 +3,43 @@ var Promise = require('bluebird');
 var models = require('./models'),
     Author = models.Author,
     Book = models.Book,
-    Chapter = models.Chapter;
+    Chapter = models.Chapter,
+    db = models.db;
 var expect = require('chai').expect;
 var supertest = require('supertest');
 var agent = supertest.agent(app);
 var fs = require('fs');
-var mongoose = require('mongoose');
 
 describe('fake library app', function () {
 
-  function toPlainObject (doc) {
-    return JSON.parse(JSON.stringify(doc));
+  function toPlainObject (instance) {
+    return instance.get({plain: true});
   }
 
-  function dropAll(){
-    return Promise.all([
-      Author.remove(), 
-      Chapter.remove(), 
-      Book.remove()
-    ])
+  function wasteSomeTime () {
+    return new Promise(function (resolve) {
+      setTimeout(resolve, 5); // delay just enough to make sure you handle async stuff properly
+    });
   }
 
-  beforeEach(function () {
-    return dropAll();
+  before(function () {
+    Book.addHook('beforeCreate', wasteSomeTime);
+    Book.addHook('beforeUpdate', wasteSomeTime);
+    Book.addHook('beforeDestroy', wasteSomeTime);
+  });
+
+  before(function () {
+    Chapter.addHook('beforeCreate', wasteSomeTime);
+    Chapter.addHook('beforeUpdate', wasteSomeTime);
+    Chapter.addHook('beforeDestroy', wasteSomeTime);
+  });
+
+  before(function () {
+    return db.sync({force: true});
   });
 
   afterEach(function () {
-    return dropAll();
+    return db.sync({force: true});
   });
 
   xit('serves up static files (from the static folder in the public folder) on /files route', function (done) {
@@ -48,7 +58,7 @@ describe('fake library app', function () {
 
   xit('handles internal server errors', function (done) {
     // in an actual application, this route wouldn't exist
-    // it's here just to test how you handle errors in an express app
+    // it's here just to test how you trigger and handle errors in an express app
     agent
     .get('/broken')
     .expect(500, done);
@@ -56,7 +66,7 @@ describe('fake library app', function () {
 
   xit('handles custom errors', function (done) {
     // in an actual application, this route wouldn't exist
-    // it's here just to test how you handle errors in an express app
+    // it's here just to test how you trigger and handle errors in an express app
     agent
     .get('/forbidden')
     .expect(403, done);
@@ -66,47 +76,43 @@ describe('fake library app', function () {
 
     describe('/books', function () {
 
-      function randomMongoID () {
-        return new mongoose.Types.ObjectId();
-      }
-
       var author, book, chapter;
 
-      beforeEach(function (done) {
-        Author.create({
+      beforeEach(function () {
+        return Author.create({
           firstName: 'Testy',
           lastName: 'McTesterson'
-        }, function (err, a) {
-          if (err) return done(err);
+        })
+        .then(function (a) {
           author = a;
-          done();
         });
       });
 
-      beforeEach(function (done) {
-        Chapter.create({
+      beforeEach(function () {
+        return Chapter.create({
           title: 'First',
           text: 'Once upon a time, the end.',
           number: 1
-        }, function (err, c) {
-          if (err) return done(err);
+        })
+        .then(function (c) {
           chapter = c;
-          done();
         });
       });
 
-      beforeEach(function (done) {
-        Book.create([{
+      beforeEach(function () {
+        return Book.create({
           title: 'Best Book Ever',
-          author: author,
-          chapters: [chapter]
-        }, {
-          title: 'Worst Book Ever',
-          author: author
-        }], function (err, bs) {
-          if (err) return done(err);
-          book = bs[0];
-          done();
+          authorId: author.id
+        })
+        .then(function (b) {
+          return b.addChapter(chapter);
+        })
+        .then(function (b) {
+          book = b;
+          return Book.create({
+            title: 'Worst Book Ever',
+            authorId: author.id
+          });
         });
       });
 
@@ -127,26 +133,26 @@ describe('fake library app', function () {
         .post('/api/books')
         .send({
           title: 'Book Made By Test',
-          author: author._id,
-          chapters: [chapter._id]
+          authorId: author.id
         })
         .expect(201)
         .end(function (err, res) {
           if (err) return done(err);
           expect(res.body.title).to.equal('Book Made By Test');
-          expect(res.body._id).to.exist;
-          Book.findById(res.body._id, function (err, b) {
-            if (err) return done(err);
+          expect(res.body.id).to.exist;
+          Book.findById(res.body.id)
+          .then(function (b) {
             expect(b).to.not.be.null;
             expect(res.body).to.eql(toPlainObject(b));
             done();
-          });
+          })
+          .catch(done);
         });
       });
       
       xit('GET one', function (done) {
         agent
-        .get('/api/books/' + book._id)
+        .get('/api/books/' + book.id)
         .expect(200)
         .end(function (err, res) {
           if (err) return done(err);
@@ -157,21 +163,21 @@ describe('fake library app', function () {
 
       xit('GET one that doesn\'t exist', function (done) {
         agent
-        .get('/api/books/' + randomMongoID())
+        .get('/api/books/12345')
         .expect(404)
         .end(done);
       });
 
       xit('GET one using invalid ID', function (done) {
         agent
-        .get('/api/books/123abcnotamongoid')
+        .get('/api/books/clearlynotanid')
         .expect(500)
         .end(done);
       });
       
       xit('PUT one', function (done) {
         agent
-        .put('/api/books/' + book._id)
+        .put('/api/books/' + book.id)
         .send({
           title: 'Book Updated By Test'
         })
@@ -179,18 +185,19 @@ describe('fake library app', function () {
         .end(function (err, res) {
           if (err) return done(err);
           expect(res.body.title).to.equal('Book Updated By Test');
-          Book.findById(book._id, function (err, b) {
-            if (err) return done(err);
+          Book.findById(book.id)
+          .then(function (b) {
             expect(b).to.not.be.null;
             expect(res.body).to.eql(toPlainObject(b));
             done();
-          });
+          })
+          .catch(done);
         });
       });
 
       xit('PUT one that doesn\'t exist', function (done) {
         agent
-        .put('/api/books/' + randomMongoID())
+        .put('/api/books/54321')
         .send({title: 'Attempt To Update Book Title'})
         .expect(404)
         .end(done);
@@ -198,7 +205,7 @@ describe('fake library app', function () {
 
       xit('PUT one using invalid ID', function (done) {
         agent
-        .put('/api/books/123abcnotamongoid')
+        .put('/api/books/clearlynotanid')
         .send({title: 'Attempt To Update Book Title'})
         .expect(500)
         .end(done);
@@ -206,28 +213,29 @@ describe('fake library app', function () {
 
       xit('DELETE one', function (done) {
         agent
-        .delete('/api/books/' + book._id)
+        .delete('/api/books/' + book.id)
         .expect(204)
         .end(function (err, res) {
           if (err) return done(err);
-          Book.findById(book._id, function (err, b) {
-            if (err) return done(err);
+          Book.findById(book.id)
+          .then(function (b) {
             expect(b).to.be.null;
             done();
-          });
+          })
+          .catch(done);
         });
       });
 
       xit('DELETE one that doesn\'t exist', function (done) {
         agent
-        .delete('/api/books/' + randomMongoID())
+        .delete('/api/books/13579')
         .expect(404)
         .end(done);
       });
 
       xit('DELETE one using invalid ID', function (done) {
         agent
-        .delete('/api/books/123abcnotamongoid')
+        .delete('/api/books/clearlynotanid')
         .expect(500)
         .end(done);
       });
@@ -255,29 +263,28 @@ describe('fake library app', function () {
 
         var addedChapter, chapterBook;
 
-        beforeEach(function (done) {
-          Book.findOne({}, function (err, b) {
-            if (err) return done(err);
+        beforeEach(function () {
+          return Book.findOne({})
+          .then(function (b) {
             chapterBook = b;
-            done();
           });
         });
 
-        beforeEach(function (done) {
-          chapterBook.addChapter({
+        beforeEach(function () {
+          return Chapter.create({
             title: 'Added Chapter',
             number: 1,
             text: 'Once upon a time...'
           })
           .then(function (c) {
             addedChapter = c;
-          })
-          .then(done);
+            return chapterBook.addChapter(c);
+          });
         });
 
         xit('GET all', function (done) {
           agent
-          .get('/api/books/' + chapterBook._id + '/chapters')
+          .get('/api/books/' + chapterBook.id + '/chapters')
           .expect(200)
           .end(function (err, res) {
             if (err) return done(err);
@@ -291,7 +298,7 @@ describe('fake library app', function () {
           // notice the addChapter method we've provided for the Book model
           // it is helpful here!
           agent
-          .post('/api/books/' + chapterBook._id + '/chapters')
+          .post('/api/books/' + chapterBook.id + '/chapters')
           .send({
             title: 'Chapter Made By Test',
             text: 'A chapter made by a test',
@@ -302,49 +309,56 @@ describe('fake library app', function () {
             if (err) return done(err);
             expect(res.body.title).to.equal('Chapter Made By Test');
             var createdChapter = res.body;
-            Book.findById(chapterBook._id, function (err, b) {
-              if (err) return done(err);
-              expect(b.chapters).to.contain(createdChapter._id);
-              Chapter.findById(createdChapter._id, function (err, c) {
-                if (err) return done(err);
-                expect(c).to.not.be.null;
-                expect(res.body).to.eql(toPlainObject(c));
-                done();
+            Book.findById(chapterBook.id)
+            .then(function (b) {
+              return b.getChapters();
+            })
+            .then(function (chapters) {
+              var containsChapter = chapters.some(function (ch) {
+                return ch.id === createdChapter.id;
               });
-            });
+              expect(containsChapter).to.equal(true);
+              return Chapter.findById(createdChapter.id);
+            })
+            .then(function (c) {
+              expect(c).to.not.be.null;
+              expect(res.body).to.eql(toPlainObject(c));
+              done();
+            })
+            .catch(done);
           });
         });
         
         xit('GET one', function (done) {
-          var chapId = addedChapter._id.toHexString();
+          var chapId = addedChapter.id;
           agent
-          .get('/api/books/' + chapterBook._id + '/chapters/' + chapId)
+          .get('/api/books/' + chapterBook.id + '/chapters/' + chapId)
           .expect(200)
           .end(function (err, res) {
             if (err) return done(err);
-            expect(res.body._id).to.equal(chapId);
+            expect(res.body.id).to.equal(chapId);
             done();
           });
         });
 
         xit('GET one that doesn\'t exist', function (done) {
           agent
-          .get('/api/books/' + chapterBook._id + '/chapters/' + randomMongoID())
+          .get('/api/books/' + chapterBook.id + '/chapters/24680')
           .expect(404)
           .end(done);
         });
 
         xit('GET one using invalid ID', function (done) {
           agent
-          .get('/api/books/123abcnotamongoid')
+          .get('/api/books/clearlynotanid')
           .expect(500)
           .end(done);
         });
         
         xit('PUT one', function (done) {
-          var chapId = addedChapter._id;
+          var chapId = addedChapter.id;
           agent
-          .put('/api/books/' + chapterBook._id + '/chapters/' + chapId)
+          .put('/api/books/' + chapterBook.id + '/chapters/' + chapId)
           .send({
             title: 'Chapter Updated By Test'
           })
@@ -352,18 +366,19 @@ describe('fake library app', function () {
           .end(function (err, res) {
             if (err) return done(err);
             expect(res.body.title).to.equal('Chapter Updated By Test');
-            Chapter.findById(chapId, function (err, c) {
-              if (err) return done(err);
+            Chapter.findById(chapId)
+            .then(function (c) {
               expect(c).to.not.be.null;
               expect(res.body).to.eql(toPlainObject(c));
               done();
-            });
+            })
+            .catch(done);
           });
         });
 
         xit('PUT one that doesn\'t exist', function (done) {
           agent
-          .put('/api/books/' + chapterBook._id + '/chapters/' + randomMongoID())
+          .put('/api/books/' + chapterBook.id + '/chapters/98765')
           .send({
             title: 'Attempt To Update Chapter Title'
           })
@@ -373,7 +388,7 @@ describe('fake library app', function () {
 
         xit('PUT one using invalid ID', function (done) {
           agent
-          .put('/api/books/' + chapterBook._id + '/chapters/123abcnotamongoid')
+          .put('/api/books/' + chapterBook.id + '/chapters/clearlynotanid')
           .send({
             title: 'Attempt To Update Chapter Title'
           })
@@ -384,34 +399,40 @@ describe('fake library app', function () {
         xit('DELETE one', function (done) {
           // notice the removeChapter method we've provided for the Book model
           // it is helpful here!
-          var chapId = addedChapter._id;
+          var chapId = addedChapter.id;
           agent
-          .delete('/api/books/' + chapterBook._id + '/chapters/' + chapId)
+          .delete('/api/books/' + chapterBook.id + '/chapters/' + chapId)
           .expect(204)
           .end(function (err, res) {
             if (err) return done(err);
-            Chapter.findById(chapId, function (err, c) {
-              if (err) return done(err);
+            Chapter.findById(chapId)
+            .then(function (c) {
               expect(c).to.be.null;
-              Book.findById(chapterBook._id, function (err, b) {
-                if (err) return done(err);
-                expect(b.chapters).to.not.contain(chapId);
-                done();
+              return Book.findById(chapterBook.id);
+            })
+            .then(function (b) {
+              return b.getChapters();
+            })
+            .then(function (chapters) {
+              chapters.forEach(function (ch) {
+                expect(ch.id).to.not.equal(chapId);
               });
-            });
+              done();
+            })
+            .catch(done);
           });
         });
 
         xit('DELETE one that doesn\'t exist', function (done) {
           agent
-          .delete('/api/books/' + chapterBook._id + '/chapters/' + randomMongoID())
+          .delete('/api/books/' + chapterBook.id + '/chapters/12345')
           .expect(404)
           .end(done);
         });
 
         xit('DELETE one using invalid ID', function (done) {
           agent
-          .delete('/api/books/' + chapterBook._id + '/chapters/123abcnotamongoid')
+          .delete('/api/books/' + chapterBook.id + '/chapters/clearlynotanid')
           .expect(500)
           .end(done);
         });

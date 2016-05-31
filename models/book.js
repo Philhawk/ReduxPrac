@@ -1,41 +1,12 @@
-var mongoose = require('mongoose');
-var Chapter = require('./chapter');
+var Promise = require('bluebird');
+var Sequelize = require('sequelize');
 
-var bookSchema = new mongoose.Schema({
-  title: String,
-  author: {type: mongoose.Schema.Types.ObjectId, ref: 'Author'},
-  chapters: [{type: mongoose.Schema.Types.ObjectId, ref: 'Chapter'}]
+var db = require('./_db');
+
+var Book = db.define('book', {
+  title: Sequelize.STRING
+}, {
+  timestamps: false
 });
 
-bookSchema.methods.addChapter = function (chapterData) {
-  var book = this;
-  var chapter;
-  return Chapter.create(chapterData)
-  .then(function (c) {
-    chapter = c;
-    book.chapters.addToSet(c._id);
-    return book.save();
-  })
-  .then(function () {
-    return chapter;
-  });
-};
-
-bookSchema.methods.removeChapter = function (chapter) {
-  var book = this;
-  return chapter.remove()
-  .then(function () {
-    book.chapters.pull(chapter);
-    return book.save();
-  });
-};
-
-bookSchema.pre('save', function (next) {
-  setTimeout(next, 5); // for the specs: delay just enough to make sure you handle async stuff properly
-});
-
-bookSchema.pre('remove', function (next) {
-  setTimeout(next, 5); // for the specs: delay just enough to make sure you handle async stuff properly
-});
-
-module.exports = mongoose.model('Book', bookSchema);
+module.exports = Book;

@@ -1,17 +1,14 @@
-var mongoose = require('mongoose');
+var Promise = require('bluebird');
+var Sequelize = require('sequelize');
 
-var chapterSchema = new mongoose.Schema({
-  title: String,
-  number: Number,
-  text: String
+var db = require('./_db');
+
+var Chapter = db.define('chapter', {
+  title: Sequelize.STRING,
+  number: Sequelize.INTEGER,
+  text: Sequelize.TEXT
+}, {
+  timestamps: false
 });
 
-chapterSchema.pre('save', function (next) {
-  setTimeout(next, 5); // for the specs: delay just enough to make sure you handle async stuff properly
-});
-
-chapterSchema.pre('remove', function (next) {
-  setTimeout(next, 5); // for the specs: delay just enough to make sure you handle async stuff properly
-});
-
-module.exports = mongoose.model('Chapter', chapterSchema);
+module.exports = Chapter

@@ -1,8 +1,12 @@
-var mongoose = require('mongoose');
+var Sequelize = require('sequelize');
 
-var authorSchema = new mongoose.Schema({
-  firstName: String,
-  lastName: String
+var db = require('./_db');
+
+var Author = db.define('author', {
+  firstName: Sequelize.STRING,
+  lastName: Sequelize.STRING
+}, {
+  timestamps: false
 });
 
-module.exports = mongoose.model('Author', authorSchema);
+module.exports = Author;

@@ -149,7 +149,7 @@ describe('fake library app', function () {
           .catch(done);
         });
       });
-      
+
       xit('GET one', function (done) {
         agent
         .get('/api/books/' + book.id)
@@ -174,7 +174,7 @@ describe('fake library app', function () {
         .expect(500)
         .end(done);
       });
-      
+
       xit('PUT one', function (done) {
         agent
         .put('/api/books/' + book.id)
@@ -295,7 +295,7 @@ describe('fake library app', function () {
         });
 
         xit('POST one', function (done) {
-          // notice the addChapter method we've provided for the Book model
+          // take a look at the Sequelize docs for adding and/or creating associations
           // it is helpful here!
           agent
           .post('/api/books/' + chapterBook.id + '/chapters')
@@ -328,7 +328,7 @@ describe('fake library app', function () {
             .catch(done);
           });
         });
-        
+
         xit('GET one', function (done) {
           var chapId = addedChapter.id;
           agent
@@ -354,7 +354,7 @@ describe('fake library app', function () {
           .expect(500)
           .end(done);
         });
-        
+
         xit('PUT one', function (done) {
           var chapId = addedChapter.id;
           agent
@@ -397,7 +397,7 @@ describe('fake library app', function () {
         });
 
         xit('DELETE one', function (done) {
-          // notice the removeChapter method we've provided for the Book model
+          // take a look at the Sequelize docs for removing associations
           // it is helpful here!
           var chapId = addedChapter.id;
           agent

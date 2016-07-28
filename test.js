@@ -350,7 +350,7 @@ describe('fake library app', function () {
 
         xit('GET one using invalid ID', function (done) {
           agent
-          .get('/api/books/clearlynotanid')
+          .get('/api/books/' + chapterBook.id + '/chapters/clearlynotanid')
           .expect(500)
           .end(done);
         });

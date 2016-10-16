@@ -1,4 +1,5 @@
 var app = require('./app');
+
 var Promise = require('bluebird');
 var models = require('./models'),
     Author = models.Author,
@@ -42,7 +43,7 @@ describe('fake library app', function () {
     return db.sync({force: true});
   });
 
-  xit('serves up static files (from the static folder in the public folder) on /files route', function (done) {
+  it('serves up static files (from the static folder in the public folder) on /files route', function (done) {
     agent
     .get('/files/index.html')
     .expect(200)
@@ -56,7 +57,7 @@ describe('fake library app', function () {
     });
   });
 
-  xit('handles internal server errors', function (done) {
+  it('handles internal server errors', function (done) {
     // in an actual application, this route wouldn't exist
     // it's here just to test how you trigger and handle errors in an express app
     agent

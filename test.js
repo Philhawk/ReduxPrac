@@ -65,7 +65,7 @@ describe('fake library app', function () {
     .expect(500, done);
   });
 
-  xit('handles custom errors', function (done) {
+  it('handles custom errors', function (done) {
     // in an actual application, this route wouldn't exist
     // it's here just to test how you trigger and handle errors in an express app
     agent
@@ -117,7 +117,7 @@ describe('fake library app', function () {
         });
       });
 
-      xit('GET all', function (done) {
+      it('GET all', function (done) {
         agent
         .get('/api/books')
         .expect(200)
@@ -129,7 +129,7 @@ describe('fake library app', function () {
         });
       });
 
-      xit('POST one', function (done) {
+      it('POST one', function (done) {
         agent
         .post('/api/books')
         .send({

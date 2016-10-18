@@ -1,16 +1,10 @@
-var express = require('express');
-var router = express.Router();
-var Book = require('../models/book.js')
+'use strict';
 
-router.get('/broken', function(req, res, next){
-  res.sendStatus(500);
-})
+const express = require('express');
+const router = express.Router();
+const Book = require('../models/book.js')
 
-router.get('/forbidden', function(req, res, next){
-  res.sendStatus(403);
-})
-
-router.get('/api/books', function(req, res, next){
+router.get('/', (req, res, next) => {
 	Book.findAll({ where: req.query })
 		.then(books => {
 			books.length ? res.json(books) : res.sendStatus(404);
@@ -18,15 +12,15 @@ router.get('/api/books', function(req, res, next){
 		.catch(next);
 });
 
-router.get('/api/books/:id', function(req, res, next){
-	Book.findById(req.params.id)
+router.get('/:bookID', (req, res, next) => {
+	Book.findById(req.params.bookID)
 		.then(book => {
       !book ? res.sendStatus(404) : res.status(200).send(book.dataValues);
 		})
 		.catch(next);
 });
 
-router.post('/api/books', function(req, res, next){
+router.post('/', (req, res, next) => {
 	Book.create(req.body)
 		.then(book => {
 			res.status(201).send(book.dataValues);
@@ -34,8 +28,8 @@ router.post('/api/books', function(req, res, next){
 		.catch(next);
 });
 
-router.put('/api/books/:id', (req, res, next) => {
-  Book.findById(req.params.id)
+router.put('/:bookID', (req, res, next) => {
+  Book.findById(req.params.bookID)
     .then(book => {
       if (book) {
         book.updateAttributes(req.body)
@@ -47,8 +41,8 @@ router.put('/api/books/:id', (req, res, next) => {
     .catch(next)
 })
 
-router.delete('/api/books/:id', (req, res, next) => {
-  Book.findById(req.params.id)
+router.delete('/:bookID', (req, res, next) => {
+  Book.findById(req.params.bookID)
     .then(book => {
       if (book) {
         book.destroy()

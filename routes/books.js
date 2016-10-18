@@ -1,9 +1,10 @@
-'use strict';
-
 const express = require('express');
 const router = express.Router();
 const Book = require('../models/book.js')
 
+// GET All
+// 1. Find all the books - and if a query string exists, search by the string.
+// 2. If books exists, send the json object back, if not - send a status of 404.
 router.get('/', (req, res, next) => {
 	Book.findAll({ where: req.query })
 		.then(books => {
@@ -12,6 +13,10 @@ router.get('/', (req, res, next) => {
 		.catch(next);
 });
 
+// GET by ID
+// 1. Find a book by its ID that's been been passed in.
+// 2. If the book does not exist, send a status of 404
+// 3, If the book DOES exist, send a 200 success status with the books dataValues.
 router.get('/:bookID', (req, res, next) => {
 	Book.findById(req.params.bookID)
 		.then(book => {
@@ -20,6 +25,9 @@ router.get('/:bookID', (req, res, next) => {
 		.catch(next);
 });
 
+//CREATE a book
+// 1. Create the book by body content of the request.
+// 2. Send a 201 successfully created status along with the books dataValues.
 router.post('/', (req, res, next) => {
 	Book.create(req.body)
 		.then(book => {

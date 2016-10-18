@@ -1,14 +1,15 @@
-'use strict'
-
 const express = require('express')
 const router = express.Router()
 
 router.get('/', (req, res, next) => {
-  if (req.session.views) {
-    req.session.views++
-    res.send({ number: req.session.views - 1 })
+  // If views exist on the session, increment the number and send the new overall views count
+  let sess = req.session
+  if (sess.views) {
+    sess.views++
+    res.send({ number: sess.views - 1 })
   } else {
-    req.session.views = 1
+    // if a new client visits only once, only send back the session views of zero
+    sess.views = 1
     res.send({ number: 0 })
   }
 })

@@ -26,7 +26,6 @@
   "dependencies": {
     "bluebird": "^3.3.3",
     "body-parser": "^1.15.2",
-    "eslint": "^3.8.1",
     "express": "^4.12.3",
     "express-session": "^1.14.1",
     "pg": "^4.5.5",

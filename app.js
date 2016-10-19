@@ -10,9 +10,7 @@ const app = express();
 
 // Express Session setup. This allows for tracking of individual user visits on the session.
 app.use(session({
-  secret: 'mango pancakes',
-  resave: false,
-  saveUninitialized: true,
+  secret: 'mango pancakes'
 }));
 
 // First requires the bodyParser library

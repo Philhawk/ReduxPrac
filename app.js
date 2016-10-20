@@ -31,7 +31,10 @@ app.use('/api/books', chapterRoutes);
 
 // I did not like sequelize database errors yelling at me. A fall back error handler allows those occurs to disappear ... quietly
 app.use((err, req, res, next) => {
-  err.message === 'potato' ? res.sendStatus(403) : res.sendStatus(500);
+  if (err.message) {
+    console.error(err.message)
+  }
+  res.sendStatus(err.status || 500);
 });
 
 module.exports = app;

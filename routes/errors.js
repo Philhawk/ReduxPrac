@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const Book = require('../models/book.js')
 
+// Error handling routes
 router.get('/broken', (req, res, next) => {
   res.sendStatus(500);
 })

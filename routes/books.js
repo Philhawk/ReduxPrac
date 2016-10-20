@@ -20,7 +20,7 @@ router.get('/', (req, res, next) => {
 router.get('/:bookID', (req, res, next) => {
 	Book.findById(req.params.bookID)
 		.then(book => {
-      !book ? res.sendStatus(404) : res.status(200).send(book.dataValues);
+      !book ? res.sendStatus(404) : res.status(200).send(book);
 		})
 		.catch(next);
 });
@@ -31,7 +31,7 @@ router.get('/:bookID', (req, res, next) => {
 router.post('/', (req, res, next) => {
 	Book.create(req.body)
 		.then(book => {
-			res.status(201).send(book.dataValues);
+			res.status(201).send(book);
 		})
 		.catch(next);
 });

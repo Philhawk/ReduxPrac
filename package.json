@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "mocha --reporter spec test.js",
+    "test": "mocha --watch --reporter spec test.js",
     "grade": "mocha --reporter spec --timeout 300 test.js",
     "db-init": "./db-init.sh",
     "postinstall": "npm run db-init"

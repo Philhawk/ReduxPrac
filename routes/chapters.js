@@ -5,6 +5,9 @@ const Book = require('../models/book.js')
 const Chapter = require('../models/chapter.js')
 
 
+// GET All chapters from a Books ID
+// 1. Find all the chapters, and filter through the bookID that' been passed in
+// 2. If chapters exist, send it back
 router.get('/:bookId/chapters', (req, res, next) => {
   Chapter.findAll({
     where: {
@@ -15,7 +18,10 @@ router.get('/:bookId/chapters', (req, res, next) => {
     .catch(next)
 })
 
-/
+// POST a new chapter
+// 1. Find the book by its particular ID. If the book exxists, create a new chapter
+// with the parameters on the req.body
+// 2. Send successfully created status back along with the chapter data
 router.post('/:bookId/chapters', (req, res, next) => {
   Book.findById(req.params.bookId)
     .then(book => {
@@ -25,6 +31,10 @@ router.post('/:bookId/chapters', (req, res, next) => {
     .catch(next)
 });
 
+// GET one particular chapter from a Book ID
+// 1. Find the chapter by its particular ID. If the chapter exists, create a new chapter
+// with the parameters on the req.body
+// 2. Send successfully created status back along with the chapter data
 router.get('/:bookId/chapters/:chapterId', (req, res, next) => {
   Chapter.findById(req.params.chapterId)
     .then(chapter => {
@@ -32,14 +42,19 @@ router.get('/:bookId/chapters/:chapterId', (req, res, next) => {
         if (chapter.bookId === +req.params.bookId) {
           res.send(chapter);
         } else {
-          res.status(404).send()
+          res.sendStatus(404)
         }
       } else {
-        res.status(404).send();
+        res.sendStatus(404);
       }
     })
     .catch(next);
 })
+
+// UPDATE one particular chapter
+// 1. Find the chapter by its particular ID. If the chapter exists, update its
+// attributes with the parameters on the req.body
+// 2. Send the newly updated chapter
 
 router.put('/:bookId/chapters/:chapterId', (req, res, next) => {
   Chapter.findById(req.params.chapterId)
@@ -49,14 +64,18 @@ router.put('/:bookId/chapters/:chapterId', (req, res, next) => {
           chapter.updateAttributes(req.body)
             .then(newlyUpdatedChapter => res.send(newlyUpdatedChapter))
         } else {
-          res.status(404).send();
+          res.sendStatus(404);
         }
       } else {
-        res.status(404).send()
+        res.sendStatus(404);
       }
     })
     .catch(next);
 })
+
+// DELETE one particular chapter
+// 1. Find the chapter by its particular ID. If the chapter exists, delete
+// 2. Send the status back AND
 
 router.delete('/:bookId/chapters/:chapterId', (req, res, next) => {
   Chapter.findById(req.params.chapterId)
@@ -64,12 +83,12 @@ router.delete('/:bookId/chapters/:chapterId', (req, res, next) => {
       if (chapter) {
         if (chapter.bookId === +req.params.bookId) {
           chapter.destroy()
-            .then(() => res.status(204).send());
+            .then(() => res.sendStatus(204));
         } else {
-          res.status(404).send()
+          res.sendStatus(404);
         }
       } else {
-        res.status(404).send();
+        res.sendStatus(404);
       }
     })
     .catch(next)
